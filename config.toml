@@ -1,0 +1,8 @@
+[api]
+port = "9000"
+
+[database]
+host = "localhost"
+user = "postgres"
+pass = "1234"
+name = "api_golang"
