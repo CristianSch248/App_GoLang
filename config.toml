@@ -6,3 +6,6 @@ host = "localhost"
 user = "postgres"
 pass = "1234"
 name = "api_golang"
+
+[vagalume]
+key = "db9712ecf2fb087cc5993bd5cf8e8c93"

@@ -7,10 +7,12 @@ import (
 )
 
 func GetRoutes() *chi.Mux {
-	r := chi.NewRouter()
+	route := chi.NewRouter()
 
-	r.Get("/hello", handlers.HelloHandler)
-	r.Get("/another", handlers.AnotherHandler)
+	route.Get("/musicas", handlers.GetMusicas)
 
-	return r
+	// r.Get("/hello", handlers.HelloHandler)
+	// r.Get("/another", handlers.AnotherHandler)
+
+	return route
 }
