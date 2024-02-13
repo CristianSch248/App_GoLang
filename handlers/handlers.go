@@ -6,43 +6,21 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/CristianSch248/App_GoLang/model"
+
 	"github.com/BurntSushi/toml"
+
+	"context"
+	"io"
+
+	language "cloud.google.com/go/language/apiv2"
+	"cloud.google.com/go/language/apiv2/languagepb"
 )
 
 type Vagalume struct {
 	Key struct {
 		key string `toml:"key"`
 	} `toml:"vagalume"`
-}
-
-/*
-Resposta é uma estrutura que define a estrutura de dados da resposta
-JSON que esperamos receber da API do Vagalume.
-
-Ela possui campos correspondentes aos diferentes aspectos da resposta,
-como tipo, informações do artista, informações das músicas, etc.
-*/
-type Resposta struct {
-	Type string `json:"type"`
-	Art  struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"art"`
-	Mus []struct {
-		ID        string `json:"id"`
-		Name      string `json:"name"`
-		URL       string `json:"url"`
-		Lang      int    `json:"lang"`
-		Text      string `json:"text"`
-		Translate []struct {
-			ID   string `json:"id"`
-			Lang int    `json:"lang"`
-			URL  string `json:"url"`
-			Text string `json:"text"`
-		} `json:"translate"`
-	} `json:"mus"`
-	Badwords bool `json:"badwords"`
 }
 
 func GetMusicas(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +46,7 @@ func GetMusicas(w http.ResponseWriter, r *http.Request) {
 
 	defer resposta.Body.Close()
 
-	var corpoResposta Resposta
+	var corpoResposta model.Resposta
 
 	err = json.NewDecoder(resposta.Body).Decode(&corpoResposta)
 	if err != nil {
@@ -85,4 +63,36 @@ func GetMusicas(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respostaJSON)
+}
+
+func AnalizeMusic() {
+	// analyzeSentiment(musica)
+}
+
+func analyzeSentiment(w io.Writer, text string) error {
+	ctx := context.Background()
+
+	// Initialize client.
+	client, err := language.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	resp, err := client.AnalyzeSentiment(ctx, &languagepb.AnalyzeSentimentRequest{
+		Document: &languagepb.Document{
+			Source: &languagepb.Document_Content{
+				Content: text,
+			},
+			Type: languagepb.Document_PLAIN_TEXT,
+		},
+		EncodingType: languagepb.EncodingType_UTF8,
+	})
+
+	if err != nil {
+		return fmt.Errorf("AnalyzeSentiment: %w", err)
+	}
+	fmt.Fprintf(w, "Response: %q\n", resp)
+
+	return nil
 }

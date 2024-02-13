@@ -11,8 +11,5 @@ func GetRoutes() *chi.Mux {
 
 	route.Get("/musicas", handlers.GetMusicas)
 
-	// r.Get("/hello", handlers.HelloHandler)
-	// r.Get("/another", handlers.AnotherHandler)
-
 	return route
 }
